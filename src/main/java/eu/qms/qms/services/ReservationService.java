@@ -1,13 +1,14 @@
 package eu.qms.qms.services;
 
-import eu.qms.qms.model.Reservation;
 import eu.qms.qms.model.ReservationEntity;
+import eu.qms.qms.model.ReservationListObject;
 import eu.qms.qms.repositories.ReservationRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ReservationService {
@@ -34,14 +35,23 @@ public class ReservationService {
         return reservationRepository.countAllByReservedOnBefore(time);
     }
 
-    public ReservationEntity getReservation(Integer studentId) {
-        Optional<ReservationEntity> reservationEntityOptional = reservationRepository.findTopByStudentId(studentId);
-        if (reservationEntityOptional.isPresent()) {
-            System.out.println("jest :)");
-        } else {
-            System.out.println("nie ma :(");
+    public ReservationListObject getReservation(Integer studentId) {
+        ReservationEntity reservationEntity = reservationRepository.findTopByStudentId(studentId).get();
+        Integer numberOfReservationBeforeThisOne = getNumberOfReservationsBefore(reservationEntity.getReservedOn());
+        ReservationListObject reservationListObject = new ReservationListObject(reservationEntity);
+        reservationListObject.setPosition(numberOfReservationBeforeThisOne+1);
+        ZonedDateTime nextMonday = getNextMonday();
+        reservationListObject.setEstimatedTime(DateTimeFormatter.ofPattern("hh:mm dd/MM/yyyy").format(nextMonday.plusMinutes(numberOfReservationBeforeThisOne*5)));
+        return reservationListObject;
+    }
+
+    private ZonedDateTime getNextMonday() {
+        ZonedDateTime nextMonday = ZonedDateTime.now();
+        while (nextMonday.getDayOfWeek() != DayOfWeek.MONDAY) {
+            nextMonday = nextMonday.plusDays(1);
         }
-        return reservationEntityOptional.get();
+        nextMonday = nextMonday.withHour(9).withMinute(0).withSecond(0).withNano(0);
+        return nextMonday;
     }
 
     public void deleteReservation(String reservationToken) {

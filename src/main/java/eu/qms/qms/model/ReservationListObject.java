@@ -1,20 +1,13 @@
 package eu.qms.qms.model;
 
-import java.time.ZonedDateTime;
-
 public class ReservationListObject {
 
     private String email;
     private Integer studentId;
     private String reason;
-
-    public void setEstimatedTime(ZonedDateTime estimatedTime) {
-        this.estimatedTime = estimatedTime;
-    }
-
-    private ZonedDateTime estimatedTime;
-    private String estimatedTimeString;
+    private String estimatedTime;
     private String reservationToken;
+    private Integer position;
 
     public ReservationListObject() {
     }
@@ -23,8 +16,17 @@ public class ReservationListObject {
         this.email = reservationEntity.getEmail();
         this.studentId = reservationEntity.getStudentId();
         this.reason = reservationEntity.getReason();
-        this.estimatedTimeString = reservationEntity.getReservedOn().toString();
+        this.estimatedTime = reservationEntity.getReservedOn().toString();
         this.reservationToken = reservationEntity.getReservationToken();
+    }
+
+    public ReservationListObject(String email, Integer studentId, String reason, String estimatedTime, String reservationToken, Integer position) {
+        this.email = email;
+        this.studentId = studentId;
+        this.reason = reason;
+        this.estimatedTime = estimatedTime;
+        this.reservationToken = reservationToken;
+        this.position = position;
     }
 
     public String getEmail() {
@@ -65,16 +67,24 @@ public class ReservationListObject {
                 ", email='" + email + '\'' +
                 ", studentId=" + studentId +
                 ", reason='" + reason + '\'' +
-                ", estimatedTimeString='" + estimatedTimeString + '\'' +
+                ", estimatedTime='" + estimatedTime + '\'' +
                 ", reservationToken='" + reservationToken + '\'' +
                 '}';
     }
 
-    public String getEstimatedTimeString() {
-        return estimatedTime.toString();
+    public String getEstimatedTime() {
+        return estimatedTime;
     }
 
-    public void setEstimatedTimeString(String estimatedTimeString) {
-        this.estimatedTimeString = estimatedTimeString;
+    public void setEstimatedTime(String estimatedTime) {
+        this.estimatedTime = estimatedTime;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 }
