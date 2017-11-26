@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
@@ -40,17 +37,16 @@ public class ReservationController {
         return headers;
     }
 
-    @PostMapping("/")
-    @ApiOperation(value = "Make reservation")
-    public HttpEntity<Map<String, String>> makeReservation(@ApiParam(value = "Reservation json", required = true) @RequestBody Reservation reservation) {
-        //TODO: Send e-mail
-        reservationService.addReservation(new ReservationEntity(reservation, ZonedDateTime.now(), UUID.randomUUID().toString()));
+    @GetMapping("/{reservationToken}/confirm")
+    @ApiOperation(value = "Confirm reservation")
+    public HttpEntity<Map<String, String>> confirmReservation(@ApiParam(value = "Reservation json", required = true) @PathVariable String reservationToken) {
+        reservationService.confirmReservation(reservationToken);
         return new HttpEntity<>(getHeaderForCors());
     }
 
     @GetMapping(value = "/{studentId}", produces = APPLICATION_JSON_VALUE)
     public HttpEntity<ReservationListObject> getStudentsReservation(@PathVariable Integer studentId) {
-        ReservationListObject reservationListObject = reservationService.getReservation(studentId);
+        ReservationListObject reservationListObject = reservationService.getReservation(studentId, true);
 //        reservationListObject.setReservationToken(null);
         return new HttpEntity<>(reservationListObject, getHeaderForCors());
     }
@@ -78,25 +74,28 @@ public class ReservationController {
             reservationListObjects.add(reservationListObject);
         }
         //reservationEntityList.forEach(reservationEntity -> reservationListObjects.add(new ReservationListObject(reservationEntity)));
+        reservationListObjects.sort(Comparator.comparingInt(ReservationListObject::getPosition));
         return reservationListObjects;
     }
 
     @DeleteMapping("/{reservationToken}")
     public HttpEntity deleteReservation(@PathVariable String reservationToken) {
-        reservationService.deleteReservation(reservationToken);
+        reservationService.deleteReservation(reservationToken, true);
         return new HttpEntity(getHeaderForCors());
     }
 
     @PostMapping("/delete/{reservationToken}")
     public HttpEntity deleteReservationViaPost(@PathVariable String reservationToken) {
-        reservationService.deleteReservation(reservationToken);
+        reservationService.deleteReservation(reservationToken, true);
         return new HttpEntity(getHeaderForCors());
     }
 
     @PostMapping("/emails/")
     public HttpStatus sendEmail(@ApiParam(value = "Reservation json", required = true) @RequestBody Reservation reservation) throws Exception {
         //TODO: Send e-mail with link with studentId and reservationToken
-        EmailSender.send();
+        String reservationToken = UUID.randomUUID().toString();
+        reservationService.addReservation(new ReservationEntity(reservation, ZonedDateTime.now(), reservationToken, false));
+        EmailSender.send(reservation.getEmail(), reservation.getStudentId(), reservationToken);
         return HttpStatus.OK;
     }
 

@@ -9,6 +9,8 @@ import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationService {
@@ -23,8 +25,16 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
+    public void confirmReservation(String reservationToken) {
+        Optional<ReservationEntity> reservationEntity = reservationRepository.findByReservationTokenAndConfirmed(reservationToken, false);
+        reservationEntity.get().setConfirmed(true);
+        reservationRepository.delete(reservationEntity.get().getId());
+        reservationRepository.save(reservationEntity.get());
+    }
+
     public List<ReservationEntity> getReservations() {
-        return reservationRepository.findAll();
+        List<ReservationEntity> reservationEntityList = reservationRepository.findAll();
+        return reservationEntityList.stream().filter(ReservationEntity::getConfirmed).collect(Collectors.toList());
     }
 
     /*public ReservationEntity getReservation(String reservationToken) {
@@ -32,11 +42,13 @@ public class ReservationService {
     }*/
 
     public Integer getNumberOfReservationsBefore(ZonedDateTime time) {
-        return reservationRepository.countAllByReservedOnBefore(time);
+        return reservationRepository.countAllByReservedOnBeforeAndConfirmed(time, true);
     }
 
-    public ReservationListObject getReservation(Integer studentId) {
-        ReservationEntity reservationEntity = reservationRepository.findTopByStudentId(studentId).get();
+
+
+    public ReservationListObject getReservation(Integer studentId, Boolean isConfirmed) {
+        ReservationEntity reservationEntity = reservationRepository.findTopByStudentIdAndConfirmed(studentId, isConfirmed).get();
         Integer numberOfReservationBeforeThisOne = getNumberOfReservationsBefore(reservationEntity.getReservedOn());
         ReservationListObject reservationListObject = new ReservationListObject(reservationEntity);
         reservationListObject.setPosition(numberOfReservationBeforeThisOne+1);
@@ -54,7 +66,7 @@ public class ReservationService {
         return nextMonday;
     }
 
-    public void deleteReservation(String reservationToken) {
-        reservationRepository.delete(reservationRepository.findByReservationToken(reservationToken).get());
+    public void deleteReservation(String reservationToken, Boolean isConfirmed) {
+        reservationRepository.delete(reservationRepository.findByReservationTokenAndConfirmed(reservationToken, isConfirmed).get());
     }
 }

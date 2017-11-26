@@ -12,11 +12,7 @@ public class EmailSender {
     // Replace sender@example.com with your "From" address.
     // This address must be verified.
     static final String FROM = "defozo@gmail.com";
-    static final String FROMNAME = "Sender Name";
-
-    // Replace recipient@example.com with a "To" address. If your account
-    // is still in the sandbox, this address must be verified.
-    static final String TO = "defozo@gmail.com";
+    static final String FROMNAME = "Queue Management System";
 
     // Replace smtp_username with your Amazon SES SMTP user name.
     static final String SMTP_USERNAME = "AKIAJFJO5NJZXQU7TIXA";
@@ -35,17 +31,57 @@ public class EmailSender {
     // The port you will connect to on the Amazon SES SMTP endpoint.
     static final int PORT = 587;
 
-    static final String SUBJECT = "Amazon SES test (SMTP interface accessed using Java)";
+    static final String SUBJECT = "Queue Management System confirmation e-mail";
 
-    static final String BODY = String.join(
-            System.getProperty("line.separator"),
-            "<h1>Queue Management System</h1>",
-            "<p>To complete reservation request please ",
-            "<a href='https://4de5d104.ngrok.io/reservation/:student_id/:reservation_token'>click here</a>",
-            "."
-    );
+    public static void send(String emailAddress, Integer studentId, String reservationToken) throws Exception {
+        String TO = emailAddress;
 
-    public static void send() throws Exception {
+        String BODY = String.join(
+                System.getProperty("line.separator"),
+                "<h1>Queue Management System</h1>",
+                "<p>To complete reservation request please ",
+                "<a href='https://77c36733.ngrok.io/reservation/confirm/",
+                studentId.toString(),
+                "/",
+                reservationToken,
+                "'>click here</a>."
+        );
+
+        /*String BODY = "<html>\n" +
+                "<head>\n" +
+                "    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>\n" +
+                "\n" +
+                "    <!-- Latest compiled and minified CSS -->\n" +
+                "    <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\"\n" +
+                "          integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\">\n" +
+                "\n" +
+                "    <!-- Optional theme -->\n" +
+                "    <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css\"\n" +
+                "          integrity=\"sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp\" crossorigin=\"anonymous\">\n" +
+                "\n" +
+                "    <!-- Latest compiled and minified JavaScript -->\n" +
+                "    <script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js\"\n" +
+                "            integrity=\"sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa\"\n" +
+                "            crossorigin=\"anonymous\"></script>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "<div class=\"container\">\n" +
+                "    <h2 class=\"lead\">Queue Management System</h2>\n" +
+                "    <p class=\"lead\">Witaj,</p>\n" +
+                "    <p class=\"text-justify\">Zarejestrowałeś się w kolejce do prodziekana.</p>\n" +
+                "    <p class=\"text-justify\">Proszę o potwierdzenie przybycia klikając w przycisk:</p>\n" +
+                "    <br/>\n" +
+                "    <a href=\"https://77c36733.ngrok.io/reservation/" + studentId + "/" + reservationToken + "\" class=\"btn btn-lg btn-success\">Potwierdź</a>\n" +
+                "    <hr/>\n" +
+                "    <address>\n" +
+                "        <strong>Nieistniejący dziekanat</strong><br/>\n" +
+                "        ul. Gdzieś 3<br/>\n" +
+                "        11-111 Świat<br/>\n" +
+                "        Tel.: 12 123 12 23<br/>\n" +
+                "    </address>\n" +
+                "</div>\n" +
+                "</body>\n" +
+                "</html>";*/
 
         // Create a Properties object to contain connection configuration information.
         Properties props = System.getProperties();

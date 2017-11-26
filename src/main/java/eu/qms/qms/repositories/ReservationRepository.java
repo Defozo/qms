@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<ReservationEntity, Long> {
 
-    Optional<ReservationEntity> findByReservationToken(String reservationToken);
-    Optional<ReservationEntity> findTopByStudentId(Integer studentId);
-    Integer countAllByReservedOnBefore(ZonedDateTime estimatedTime);
+    Optional<ReservationEntity> findByReservationTokenAndConfirmed(String reservationToken, Boolean isConfirmed);
+    Optional<ReservationEntity> findTopByStudentIdAndConfirmed(Integer studentId, Boolean isConfirmed);
+    Integer countAllByReservedOnBeforeAndConfirmed(ZonedDateTime estimatedTime, Boolean isConfirmed);
 
 }

@@ -17,6 +17,7 @@ public class ReservationEntity {
     private String reason;
     private ZonedDateTime reservedOn;
     private String reservationToken;
+    private Boolean confirmed;
 
     public ReservationEntity(String email, Integer studentId, String reason, ZonedDateTime reservedOn, String reservationToken) {
         this.email = email;
@@ -34,6 +35,15 @@ public class ReservationEntity {
     }
 
     public ReservationEntity() {
+    }
+
+    public ReservationEntity(Reservation reservation, ZonedDateTime reservedOn, String reservationToken, Boolean confirmed) {
+        this.email = reservation.getEmail();
+        this.studentId = reservation.getStudentId();
+        this.reason = reservation.getReason();
+        this.reservedOn = reservedOn;
+        this.reservationToken = reservationToken;
+        this.confirmed = confirmed;
     }
 
     public Long getId() {
@@ -94,5 +104,13 @@ public class ReservationEntity {
                 ", reservedOn=" + reservedOn.toLocalDateTime() +
                 ", reservationToken='" + reservationToken + '\'' +
                 '}';
+    }
+
+    public Boolean getConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(Boolean confirmed) {
+        this.confirmed = confirmed;
     }
 }
