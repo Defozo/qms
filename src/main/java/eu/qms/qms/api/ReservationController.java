@@ -7,21 +7,24 @@ import eu.qms.qms.services.ReservationService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/api/v1/reservations")
-@CrossOrigin(origins = "*", methods = {RequestMethod.DELETE, RequestMethod.GET, RequestMethod.POST}, maxAge = 3600)
+//@CrossOrigin(origins = "*", methods = {RequestMethod.DELETE, RequestMethod.GET, RequestMethod.POST}, maxAge = 3600)
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -32,7 +35,7 @@ public class ReservationController {
 
     private MultiValueMap<String, String> getHeaderForCors() {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.put("access-control-allow-origin", Collections.singletonList("*"));
+       // headers.put("access-control-allow-origin", Collections.singletonList("*"));
         return headers;
     }
 
@@ -50,6 +53,12 @@ public class ReservationController {
         reservationListObject.setReservationToken(null);
         return new HttpEntity<>(reservationListObject, getHeaderForCors());
     }
+
+    /*@GetMapping(value = "/{reservationToken}", produces = APPLICATION_JSON_VALUE)
+    public HttpEntity<ReservationListObject> getStudentsReservation(@PathVariable String reservationToken) {
+        ReservationListObject reservationListObject = reservationService.getReservation(reservationToken);
+        return new HttpEntity<>(reservationListObject, getHeaderForCors());
+    }*/
 
     @GetMapping(value = "/", produces = APPLICATION_JSON_VALUE)
     public List<ReservationListObject> getReservations() {
@@ -77,12 +86,26 @@ public class ReservationController {
         return new HttpEntity(getHeaderForCors());
     }
 
-    @RequestMapping(value= "/{reservationToken}", method=RequestMethod.OPTIONS)
+    @PostMapping("/delete/{reservationToken}")
+    public HttpEntity deleteReservationViaPost(@PathVariable String reservationToken) {
+        reservationService.deleteReservation(reservationToken);
+        return new HttpEntity(getHeaderForCors());
+    }
+
+    @PostMapping("/emails/")
+    public HttpStatus sendEmail(@ApiParam(value = "Reservation json", required = true) @RequestBody Reservation reservation) {
+        //TODO: Send e-mail with link with studentId and reservationToken
+
+        return HttpStatus.OK;
+    }
+
+    //TODO: Niepotrzebne?
+   /* @RequestMapping(value= "/{reservationToken}", method=RequestMethod.OPTIONS)
     public void corsHeaders(HttpServletResponse response, @PathVariable String reservationToken) {
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         response.addHeader("Access-Control-Allow-Headers", "origin, content-type, accept, x-requested-with");
         response.addHeader("Access-Control-Max-Age", "3600");
-    }
+    }*/
 
 }

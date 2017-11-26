@@ -27,9 +27,9 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
-    public ReservationEntity getReservation(String reservationToken) {
-        return reservationRepository.findByReservationToken(reservationToken).get();
-    }
+    /*public ReservationEntity getReservation(String reservationToken) {
+        return reservationRepository.findTopByReservationToken(reservationToken).get();
+    }*/
 
     public Integer getNumberOfReservationsBefore(ZonedDateTime time) {
         return reservationRepository.countAllByReservedOnBefore(time);
