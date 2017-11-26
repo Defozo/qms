@@ -1,5 +1,6 @@
 package eu.qms.qms.api;
 
+import eu.qms.qms.EmailSender;
 import eu.qms.qms.model.Reservation;
 import eu.qms.qms.model.ReservationEntity;
 import eu.qms.qms.model.ReservationListObject;
@@ -50,7 +51,7 @@ public class ReservationController {
     @GetMapping(value = "/{studentId}", produces = APPLICATION_JSON_VALUE)
     public HttpEntity<ReservationListObject> getStudentsReservation(@PathVariable Integer studentId) {
         ReservationListObject reservationListObject = reservationService.getReservation(studentId);
-        reservationListObject.setReservationToken(null);
+//        reservationListObject.setReservationToken(null);
         return new HttpEntity<>(reservationListObject, getHeaderForCors());
     }
 
@@ -93,9 +94,9 @@ public class ReservationController {
     }
 
     @PostMapping("/emails/")
-    public HttpStatus sendEmail(@ApiParam(value = "Reservation json", required = true) @RequestBody Reservation reservation) {
+    public HttpStatus sendEmail(@ApiParam(value = "Reservation json", required = true) @RequestBody Reservation reservation) throws Exception {
         //TODO: Send e-mail with link with studentId and reservationToken
-
+        EmailSender.send();
         return HttpStatus.OK;
     }
 
